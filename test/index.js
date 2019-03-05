@@ -11,8 +11,7 @@ const amorphHex = require('amorph-hex')
 
 ultralightbeam.options.approve = (transanctionRequest) => {
   const gasBignumber = transanctionRequest.values.gas.to(amorphBignumber.unsigned)
-  const gasPriceBignumber = transanctionRequest.values.gasPrice.to(amorphBignumber.unsigned)
-  console.log(gasBignumber.times(gasPriceBignumber).toString())
+  console.log('GAS:',gasBignumber.toString())
   return ultralightbeam.resolve(transanctionRequest)
 }
 
@@ -22,6 +21,7 @@ describe('makerFacility', () => {
 
   const zero = Amorph.from(amorphNumber.unsigned, 0)
   const one = Amorph.from(amorphNumber.unsigned, 1)
+  const two = Amorph.from(amorphNumber.unsigned, 2)
 
   const nullAddress = new Amorph((new Uint8Array(20)).fill(0))
 
@@ -94,6 +94,22 @@ describe('makerFacility', () => {
         order0.salt.should.amorphEqual(salt)
         order0.signature.should.amorphEqual(signature)
       })
+    })
+    it('should add order1', () => {
+      return makerFacility.broadcast('add(address,address,uint256,uint256,uint256,uint256,bytes)', [
+        makerAssetAddress,
+        takerAssetAddress,
+        makerAssetAmount,
+        takerAssetAmount,
+        expirationTimeSeconds,
+        salt,
+        signature
+      ], {
+        from: accounts[0]
+      }).getConfirmation()
+    })
+    it('should have ordersLength of 2', () => {
+      return makerFacility.fetch('ordersLength()', []).should.eventually.amorphEqual(two)
     })
   })
 
