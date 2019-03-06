@@ -2,67 +2,62 @@ pragma solidity ^0.4.24;
 
 contract MakerFacility {
 
-  mapping(uint256 => Order) public orders;
-
   address public owner;
-  uint256 public ordersLength;
-
-  struct Order {
-    address makerAssetAddress;
-    address takerAssetAddress;
-    uint256 makerAssetAmount;
-    uint256 takerAssetAmount;
-    uint256 expirationTimeSeconds;
-    uint256 salt;
-    bytes signature;
-  }
+  uint256 public orderOffset;
+  mapping(uint256 => bytes32) public orderSplitEncodings;
 
   constructor(
-    address makerAssetAddress,
-    address takerAssetAddress,
-    uint256 makerAssetAmount,
-    uint256 takerAssetAmount,
-    uint256 expirationTimeSeconds,
-    uint256 salt,
-    bytes signature
+    bytes32 orderSplitEncoding0,
+    bytes32 orderSplitEncoding1,
+    bytes32 orderSplitEncoding2,
+    bytes32 orderSplitEncoding3,
+    bytes32 orderSplitEncoding4,
+    bytes32 orderSplitEncoding5
   ) public {
     owner = msg.sender;
     add(
-      makerAssetAddress,
-      takerAssetAddress,
-      makerAssetAmount,
-      takerAssetAmount,
-      expirationTimeSeconds,
-      salt,
-      signature
+      orderSplitEncoding0,
+      orderSplitEncoding1,
+      orderSplitEncoding2,
+      orderSplitEncoding3,
+      orderSplitEncoding4,
+      orderSplitEncoding5
     );
   }
 
+  function orderSplitEncodingsForOrder(uint256 orderIndex) public view returns(bytes32[6]) {
+    uint256 _orderOffset = orderIndex * 6;
+    bytes32[6] memory returnable = [orderSplitEncodings[_orderOffset], orderSplitEncodings[_orderOffset + 1], orderSplitEncodings[_orderOffset + 2], orderSplitEncodings[_orderOffset + 3], orderSplitEncodings[_orderOffset + 4], orderSplitEncodings[_orderOffset + 5]];
+    return returnable;
+  }
+
   function add (
-    address makerAssetAddress,
-    address takerAssetAddress,
-    uint256 makerAssetAmount,
-    uint256 takerAssetAmount,
-    uint256 expirationTimeSeconds,
-    uint256 salt,
-    bytes signature
+    bytes32 orderSplitEncoding0,
+    bytes32 orderSplitEncoding1,
+    bytes32 orderSplitEncoding2,
+    bytes32 orderSplitEncoding3,
+    bytes32 orderSplitEncoding4,
+    bytes32 orderSplitEncoding5
   ) public {
     require(msg.sender == owner);
-    orders[ordersLength] = Order(
-      makerAssetAddress,
-      takerAssetAddress,
-      makerAssetAmount,
-      takerAssetAmount,
-      expirationTimeSeconds,
-      salt,
-      signature
-    );
-    ordersLength ++;
+    orderSplitEncodings[orderOffset] = orderSplitEncoding0;
+    orderSplitEncodings[orderOffset + 1] = orderSplitEncoding1;
+    orderSplitEncodings[orderOffset + 2] = orderSplitEncoding2;
+    orderSplitEncodings[orderOffset + 3] = orderSplitEncoding3;
+    orderSplitEncodings[orderOffset + 4] = orderSplitEncoding4;
+    orderSplitEncodings[orderOffset + 5] = orderSplitEncoding5;
+    orderOffset += 6;
   }
 
   function remove(uint256 orderIndex) public {
     require(msg.sender == owner);
-    delete orders[orderIndex];
+    uint256 _orderOffset = orderIndex * 6;
+    delete orderSplitEncodings[_orderOffset];
+    delete orderSplitEncodings[_orderOffset + 1];
+    delete orderSplitEncodings[_orderOffset + 2];
+    delete orderSplitEncodings[_orderOffset + 3];
+    delete orderSplitEncodings[_orderOffset + 4];
+    delete orderSplitEncodings[_orderOffset + 5];
   }
 
 }
