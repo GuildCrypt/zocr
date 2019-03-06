@@ -26,14 +26,14 @@ describe('makerFacility', () => {
     })
 
     it('should deploy', () => {
-      return ultralightbeam.solDeploy(makerFacilityInfo.code, makerFacilityInfo.abi, [
+      return ultralightbeam.solDeploy(makerFacilityInfo.code, makerFacilityInfo.abi, [[
         splitEncodings0[0],
         splitEncodings0[1],
         splitEncodings0[2],
         splitEncodings0[3],
         splitEncodings0[4],
         splitEncodings0[5]
-      ], {
+      ]], {
         from: accounts[0]
       }).then((_makerFacility) => {
         makerFacility = _makerFacility
@@ -42,8 +42,8 @@ describe('makerFacility', () => {
     it('should have correct code', () => {
       return ultralightbeam.eth.getCode(makerFacility.address).should.eventually.amorphEqual(makerFacilityInfo.runcode)
     })
-    it('should have ordersLength of 1', () => {
-      return makerFacility.fetch('orderOffset()', []).should.eventually.amorphEqual(params.six)
+    it('should have orderIndex of 1', () => {
+      return makerFacility.fetch('orderIndex()', []).should.eventually.amorphEqual(params.one)
     })
     it('should have correct order0', () => {
       return makerFacility.fetch('orderSplitEncodings(uint256)', [params.zero]).then((orderSplitEncodings) => {
@@ -57,14 +57,14 @@ describe('makerFacility', () => {
       })
     })
     it('should add', () => {
-      return makerFacility.broadcast('add(bytes32,bytes32,bytes32,bytes32,bytes32,bytes32)', [
+      return makerFacility.broadcast('add(bytes32[6])', [[
         splitEncodings0[0],
         splitEncodings0[1],
         splitEncodings0[2],
         splitEncodings0[3],
         splitEncodings0[4],
         splitEncodings0[5]
-      ], {
+      ]], {
         from: accounts[0]
       }).getConfirmation()
     })
