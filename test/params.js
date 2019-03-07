@@ -17,5 +17,13 @@ module.exports = {
     takerAssetAmount: Amorph.from(amorphNumber.unsigned, 110),
     expirationTimeSeconds: getRandomAmorph(4),
     salt: getRandomAmorph(6),
+  },
+  order1: {
+    makerAssetAddress: getRandomAmorph(20),
+    takerAssetAddress: getRandomAmorph(20),
+    makerAssetAmount: Amorph.from(amorphNumber.unsigned, 200),
+    takerAssetAmount: Amorph.from(amorphNumber.unsigned, 210),
+    expirationTimeSeconds: getRandomAmorph(4),
+    salt: getRandomAmorph(6),
   }
 }

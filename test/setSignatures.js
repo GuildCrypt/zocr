@@ -34,4 +34,13 @@ describe('set signatures', () => {
       params.order0.signature = Amorph.from(amorphHex.prefixed, signedOrderPojo.signature)
     })
   })
+  it('should set signature for order1', () => {
+    return zeroEx.signatureUtils.ecSignOrderAsync(
+      ultralightbeam.provider,
+      getOrderPojo(params.order1),
+      accounts[0].address.to(amorphHex.prefixed)
+    ).then((signedOrderPojo) => {
+      params.order1.signature = Amorph.from(amorphHex.prefixed, signedOrderPojo.signature)
+    })
+  })
 })

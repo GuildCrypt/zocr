@@ -6,9 +6,12 @@ contract MakerFacility {
   uint256 public orderIndex = 1;
   mapping(uint256 => bytes32[6]) public orderSplitEncodings;
 
-  constructor(bytes32[6] _orderSplitEncodings) public {
+  constructor(bytes32[6] _orderSplitEncodings, address makerFacilityPhonebook) public {
     owner = msg.sender;
     orderSplitEncodings[0] = _orderSplitEncodings;
+    if (makerFacilityPhonebook != address(0)) {
+      require(makerFacilityPhonebook.call(0));
+    }
   }
 
   function add(bytes32[6] _orderSplitEncodings) public {

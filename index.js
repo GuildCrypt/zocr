@@ -1,4 +1,9 @@
 const parseSolcOutput = require('ultralightbeam/lib/parseSolcOutput')
 const output = require('./output')
 
-module.exports = parseSolcOutput(output)['MakerFacility.sol:MakerFacility']
+const parsedSolcOuput = parseSolcOutput(output)
+
+module.exports = {
+  MakerFacility: parsedSolcOuput['MakerFacility.sol:MakerFacility'],
+  MakerFacilityPhonebook: parsedSolcOuput['MakerFacilityPhonebook.sol:MakerFacilityPhonebook']
+}
