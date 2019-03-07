@@ -1,6 +1,6 @@
 {
   "name": "makerfacility",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "An On-Chain Relay for 0x v2",
   "main": "index.js",
   "bin": {
