@@ -8,6 +8,8 @@ contract MakerFacility {
   uint256 public orderIndex = 1;
   mapping(uint256 => bytes32[6]) public orderSplitEncodings;
 
+  /// @param _orderSplitEncodings The split encodings for the 0th order
+  /// @param makerFacilityPhonebook The address of the MakerFacilityPhonebook
   constructor(bytes32[6] _orderSplitEncodings, address makerFacilityPhonebook) public {
     owner = msg.sender;
     orderSplitEncodings[0] = _orderSplitEncodings;
