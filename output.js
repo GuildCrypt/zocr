@@ -3,7 +3,6 @@ const fs = require('fs')
 
 module.exports = solc.compile({
   sources: {
-    'MakerFacilityPhonebook.sol': fs.readFileSync(`${__dirname}/contracts/MakerFacilityPhonebook.sol`, 'utf8'),
-    'MakerFacility.sol': fs.readFileSync(`${__dirname}/contracts/MakerFacility.sol`, 'utf8'),
+    'Zocr.sol': fs.readFileSync(`${__dirname}/contracts/Zocr.sol`, 'utf8'),
   }
 }, 1)

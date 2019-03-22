@@ -25,22 +25,15 @@ function getOrderPojo(orderParams) {
 }
 
 describe('set signatures', () => {
-  it('should set signature for order0', () => {
-    return zeroEx.signatureUtils.ecSignOrderAsync(
-      ultralightbeam.provider,
-      getOrderPojo(params.order0),
-      accounts[0].address.to(amorphHex.prefixed)
-    ).then((signedOrderPojo) => {
-      params.order0.signature = Amorph.from(amorphHex.prefixed, signedOrderPojo.signature)
-    })
-  })
-  it('should set signature for order1', () => {
-    return zeroEx.signatureUtils.ecSignOrderAsync(
-      ultralightbeam.provider,
-      getOrderPojo(params.order1),
-      accounts[0].address.to(amorphHex.prefixed)
-    ).then((signedOrderPojo) => {
-      params.order1.signature = Amorph.from(amorphHex.prefixed, signedOrderPojo.signature)
+  params.orders.forEach((order, index) => {
+    it(`order #${index}`, () => {
+      return zeroEx.signatureUtils.ecSignOrderAsync(
+        ultralightbeam.provider,
+        getOrderPojo(order),
+        accounts[0].address.to(amorphHex.prefixed)
+      ).then((signedOrderPojo) => {
+        order.signature = Amorph.from(amorphHex.prefixed, signedOrderPojo.signature)
+      })
     })
   })
 })
