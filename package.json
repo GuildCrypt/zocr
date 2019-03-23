@@ -1,10 +1,10 @@
 {
-  "name": "makerfacility",
+  "name": "zocr",
   "version": "1.0.1",
   "description": "An On-Chain Relay for 0x v2",
   "main": "index.js",
   "bin": {
-    "makerfacility": "bin.js"
+    "zocr": "bin.js"
   },
   "directories": {
     "test": "test"
@@ -14,14 +14,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/GuildCrypt/makerfacility.git"
+    "url": "git+https://github.com/GuildCrypt/zocr.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/GuildCrypt/makerfacility/issues"
+    "url": "https://github.com/GuildCrypt/zocr/issues"
   },
-  "homepage": "https://github.com/GuildCrypt/makerfacility#readme",
+  "homepage": "https://github.com/GuildCrypt/zocr#readme",
   "devDependencies": {
     "amorph-bignumber": "^3.0.0",
     "chai": "^4.2.0",
