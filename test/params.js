@@ -20,12 +20,13 @@ USDC.type = 'quote'
 
 function generateOrderPojo(makerAssetAddress, takerAssetAddress) {
   return {
+    makerAddress: getRandomAmorph(20),
     makerAssetAddress: makerAssetAddress,
     takerAssetAddress: takerAssetAddress,
     makerAssetAmount: getRandomAmorph(4),
     takerAssetAmount: getRandomAmorph(4),
-    expirationTimeSeconds: getRandomAmorph(4),
-    salt: getRandomAmorph(6),
+    expirationTimeSeconds: getRandomAmorph(5),
+    salt: getRandomAmorph(4),
   }
 }
 
