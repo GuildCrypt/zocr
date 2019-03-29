@@ -21,5 +21,8 @@ module.exports = class OrderRow extends Row {
       new Cell(`${sizeNumber}%`),
       new Cell(`${valuationNumber} DAI`)
     ])
+
+    this.sizeNumber = sizeNumber
+    this.valuationNumber = valuationNumber
   }
 }
