@@ -21,19 +21,24 @@
   "homepage": "https://github.com/GuildCrypt/zocr#readme",
   "devDependencies": {
     "amorph-bignumber": "^3.0.0",
+    "bluebird-stub": "0.0.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "chai-web3-bindings": "^0.1.2",
     "colors": "^1.3.3",
     "ganache-cli": "^6.4.1",
+    "localStorage": "^1.0.4",
     "mocha": "^6.0.2",
     "solc": "^0.4.25",
     "solspecdown": "^2.2.0"
   },
   "dependencies": {
-    "0x.js": "^6.0.3",
+    "@0x/order-utils": "^7.1.1",
+    "@0x/subproviders": "^4.0.4",
     "amorph": "^4.2.0",
+    "amorph-base64": "^4.0.0",
     "chai-amorph": "^1.0.2",
+    "node-localstorage": "^1.3.1",
     "ultralightbeam": "^5.1.12"
   }
 }

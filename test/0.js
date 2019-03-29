@@ -5,5 +5,4 @@ process.on('uncaughtException', (error) => {
   throw error
 })
 
-require('./setSignatures')
-require('./encoding')
+require('./localStorageDb')
