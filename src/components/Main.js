@@ -2,9 +2,11 @@ const Element = require('./Element')
 const Alert = require('./Alert')
 const Create = require('./Create')
 const amorphNumber = require('amorph-number')
+const amorphHex = require('amorph-hex')
 const OrdersTable = require('./OrdersTable')
 const Tabs = require('./Tabs')
 const Tab = require('./Tab')
+const userAddress = require('../userAddress')
 
 module.exports = class Main extends Element {
   constructor(pair) {
@@ -45,9 +47,6 @@ module.exports = class Main extends Element {
     const ordersCountNumber = ordersCount.to(amorphNumber.unsigned)
     const syncedToNumber = this.pair.syncedTo.to(amorphNumber.unsigned)
 
-    console.log('ordersCountNumber', ordersCountNumber)
-    console.log('syncedToNumber', syncedToNumber)
-
     const unsyncedCountNumber = ordersCountNumber - syncedToNumber
 
     if (unsyncedCountNumber > 0) {
@@ -55,15 +54,16 @@ module.exports = class Main extends Element {
 
       await this.pair.sync((orderIndex, order) => {
         const buyOrSell = order.makerAssetAddress.equals(this.create.quoteAssetAddress) ? 'buy' : 'sell'
-        this.buyOrdersTable.addOrder(buyOrSell, order)
+        if (buyOrSell === 'buy') {
+          this.buyOrdersTable.addOrder(buyOrSell, order)
+        }
+        if (order.makerAddress.equals(userAddress)) {
+          this.userOrdersTable.addOrder(buyOrSell, order)
+        }
         const orderIndexNumber = orderIndex.to(amorphNumber.unsigned)
         if (orderIndexNumber > 0) {
           this.setStatus('info', `Fetching order ${unsyncedCountNumber - orderIndexNumber}/${unsyncedCountNumber}...`)
         }
-      })
-
-      this.buyOrdersTable.sort((rowA, rowB) => {
-        return rowB.valuationNumber - rowA.valuationNumber
       })
     }
 

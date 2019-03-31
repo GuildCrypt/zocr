@@ -1,5 +1,6 @@
 const getSplitEncodings = require('../lib/getSplitEncodings')
-const orders = require('./orders')
+const orderParams = require('./orderParams')
+const ordersStub = require('./ordersStub')
 const getPojoFromSplitEncodings = require('../lib/getPojoFromSplitEncodings')
 const amorphBignumber = require('amorph-bignumber')
 
@@ -8,10 +9,15 @@ require('./setSignatures')
 const numericKeys = ['makerAssetAmount', 'takerAssetAmount', 'expirationTimeSeconds', 'salt']
 
 describe('encoding', () => {
-  orders.forEach((order, index) => {
-    describe(`order #${index}: maker/taker ${order.makerAssetAddress.symbol}/${order.takerAssetAddress.symbol}`, () => {
+  orderParams.forEach((orderParam, index) => {
+    describe(`order #${index}: ${orderParam[0]}/${orderParam[1]}`, () => {
+      let order
       let splitEncodings
       let pojo
+      before(async () => {
+        const orders = await ordersStub.promise
+        order = orders[index]
+      })
       it('should get split encodings', () => {
         splitEncodings = getSplitEncodings(order)
         splitEncodings.length.should.equal(5)

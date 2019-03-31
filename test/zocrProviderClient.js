@@ -2,10 +2,10 @@ const zocrStub = require('./zocr')
 const ZocrProviderClient = require('../lib/ZocrProviderClient')
 const ultralightbeam = require('./ultralightbeam')
 const Pair = require('../lib/Pair')
-const assetAddresses = require('./assetAddresses')
 const amorphNumber = require('amorph-number')
 const localStorageDbStub = require('./localStorageDb')
-const orders = require('./orders')
+const orderParams = require('./orderParams')
+const ordersStub = require('./ordersStub')
 
 
 describe('zocrProviderClient', () => {
@@ -21,9 +21,14 @@ describe('zocrProviderClient', () => {
     zocrProviderClient = new ZocrProviderClient(ultralightbeam.provider, localStorageDb, zocr.address)
   })
   describe('pairs', () => {
-    orders.forEach((order, index) => {
-      describe(`pair ${index} ${order.makerAssetAddress.symbol}/${order.takerAssetAddress.symbol}`, () => {
+    orderParams.forEach((orderParam, index) => {
+      describe(`pair ${index} ${orderParam[0]}/${orderParam[1]}`, () => {
+        let order
         let pair
+        before(async () => {
+          const orders = await ordersStub.promise
+          order = orders[index]
+        })
         it('should get pair', () => {
           pair = zocrProviderClient.getPair(order.makerAssetAddress, order.takerAssetAddress)
         })

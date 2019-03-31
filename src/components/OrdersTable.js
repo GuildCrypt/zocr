@@ -12,7 +12,9 @@ module.exports = class OrdersTable extends Table {
   }
   addOrder(buyOrSell, order) {
     const orderRow = new OrderRow(buyOrSell, order)
-    console.log(orderRow)
     this.addRow(orderRow)
+    this.sort((rowA, rowB) => {
+      return rowB.valuationNumber - rowA.valuationNumber
+    })
   }
 }

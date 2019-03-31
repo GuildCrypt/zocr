@@ -1,14 +1,20 @@
 const accounts = require('./accounts')
-const orders = require('./orders')
+const orderParams = require('./orderParams')
+const ordersStub = require('./ordersStub')
 const ultralightbeam = require('./ultralightbeam')
 const amorphHex = require('amorph-hex')
 const amorphBignumber = require('amorph-bignumber')
 const Amorph = require('amorph')
 
 describe('set signatures', () => {
-  orders.forEach((order, index) => {
+  let orders
+  before(async () => {
+    orders = await ordersStub.promise
+  })
+  orderParams.forEach((orderParam, index) => {
     it(`order #${index}`, () => {
-      return order.setSignature(ultralightbeam.provider, accounts[0].address)
+      console.log(orders[index])
+      return orders[index].setSignature(ultralightbeam.provider, accounts[0].address)
     })
   })
 })

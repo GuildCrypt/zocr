@@ -5,6 +5,7 @@ module.exports = class Tabs extends Element{
     super('ul')
     this.$.classList.add('nav')
     this.$.classList.add('nav-tabs')
+    this.$.style.marginBottom = 10
     this.tabs = []
     if (tabs) {
       tabs.forEach(this.appendTab.bind(this))
