@@ -1,10 +1,8 @@
 const getSplitEncodings = require('../lib/getSplitEncodings')
 const orderParams = require('./orderParams')
-const ordersStub = require('./ordersStub')
 const getPojoFromSplitEncodings = require('../lib/getPojoFromSplitEncodings')
 const amorphBignumber = require('amorph-bignumber')
-
-require('./setSignatures')
+const generateOrders = require('./generateOrders')
 
 const numericKeys = ['makerAssetAmount', 'takerAssetAmount', 'expirationTimeSeconds', 'salt']
 
@@ -15,25 +13,25 @@ describe('encoding', () => {
       let splitEncodings
       let pojo
       before(async () => {
-        const orders = await ordersStub.promise
+        const orders = await generateOrders()
         order = orders[index]
       })
       it('should get split encodings', () => {
-        splitEncodings = getSplitEncodings(order)
+        splitEncodings = getSplitEncodings(order.pojo)
         splitEncodings.length.should.equal(5)
         splitEncodings.forEach((splitEncoding) => {
           splitEncoding.uint8Array.length.should.equal(32)
         })
       })
       it('should pojo', () => {
-        pojo = getPojoFromSplitEncodings(order.makerAssetAddress, order.takerAssetAddress, splitEncodings)
+        pojo = getPojoFromSplitEncodings(order.pojo.makerAssetAddress, order.pojo.takerAssetAddress, splitEncodings)
         Object.keys(pojo).forEach((key) => {
           if (numericKeys.includes(key)) {
             const pojoString = pojo[key].to(amorphBignumber.unsigned).toString()
-            const orderString = order[key].to(amorphBignumber.unsigned).toString()
+            const orderString = order.pojo[key].to(amorphBignumber.unsigned).toString()
             pojoString.should.equal(orderString)
           } else {
-            pojo[key].should.amorphEqual(order[key])
+            pojo[key].should.amorphEqual(order.pojo[key])
           }
         })
       })

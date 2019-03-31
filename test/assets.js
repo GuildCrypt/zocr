@@ -4,7 +4,6 @@ const assetInfo = require('./assetInfo')
 const assetsStub = require('./assetsStub')
 const Amorph = require('amorph')
 const amorphNumber = require('amorph-number')
-const ordersStub = require('./ordersStub')
 const generateOrders = require('./generateOrders')
 
 const assetSymbols = ['WETH', 'ZRX', 'USDC', 'DAI']
@@ -14,8 +13,6 @@ const assets = {}
 describe('assets', () => {
   after(async () => {
     assetsStub.resolve(assets)
-    const orders = await generateOrders(assets)
-    ordersStub.resolve(orders)
   })
   assetSymbols.forEach((assetSymbol) => {
     describe(assetSymbol, () => {

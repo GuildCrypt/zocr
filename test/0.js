@@ -5,4 +5,4 @@ process.on('uncaughtException', (error) => {
   throw error
 })
 
-require('./assets')
+require('./orders')

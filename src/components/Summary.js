@@ -89,7 +89,7 @@ module.exports = class Summary extends Element {
     try {
       this.signButton.$.style.display = 'none'
       this.setStatus('info', 'Awaiting signature. Please follow the instructions on your Ethereum wallet.')
-      const order = new Order({
+      const order = new Order(null, {
         makerAddress: userAddress,
         makerAssetAddress: this.create.makerAssetAddress,
         takerAssetAddress: this.create.takerAssetAddress,

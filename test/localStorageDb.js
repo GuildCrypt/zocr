@@ -1,8 +1,6 @@
 const LocalStorageDb = require('../lib/LocalStorageDb')
 const Amorph = require('amorph')
-const PromiseStub = require('bluebird-stub')
-
-module.exports = new PromiseStub
+const localStorageDbStub = require('./localStorageDbStub')
 
 describe('localStorageDb', () => {
   let localStorageDb
@@ -10,7 +8,7 @@ describe('localStorageDb', () => {
   const value = new Amorph(new Uint8Array([4, 5, 6]))
 
   after(() => {
-    module.exports.resolve(localStorageDb)
+    localStorageDbStub.resolve(localStorageDb)
   })
 
   it('should create', () => {

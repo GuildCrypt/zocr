@@ -1,36 +1,28 @@
-const zocrStub = require('./zocr')
 const ZocrProviderClient = require('../lib/ZocrProviderClient')
 const ultralightbeam = require('./ultralightbeam')
 const Pair = require('../lib/Pair')
 const amorphNumber = require('amorph-number')
 const localStorageDbStub = require('./localStorageDb')
 const orderParams = require('./orderParams')
-const ordersStub = require('./ordersStub')
+const generateOrders = require('./generateOrders')
+const fetchZocrProviderClient = require('./fetchZocrProviderClient')
 
-
-describe('zocrProviderClient', () => {
-  let zocr
-  let localStorageDb
-  let pairPoller
-  before(async () => {
-    zocr = await zocrStub.promise
-    localStorageDb = await localStorageDbStub.promise
-  })
+describe('sync', () => {
   let zocrProviderClient
-  it('should create zocrProviderClient', () => {
-    zocrProviderClient = new ZocrProviderClient(ultralightbeam.provider, localStorageDb, zocr.address)
+  before(async () => {
+    zocrProviderClient = await fetchZocrProviderClient()
   })
   describe('pairs', () => {
     orderParams.forEach((orderParam, index) => {
-      describe(`pair ${index} ${orderParam[0]}/${orderParam[1]}`, () => {
+      describe(`pair #${index} ${orderParam[0]}/${orderParam[1]}`, () => {
         let order
         let pair
         before(async () => {
-          const orders = await ordersStub.promise
+          const orders = await generateOrders()
           order = orders[index]
         })
         it('should get pair', () => {
-          pair = zocrProviderClient.getPair(order.makerAssetAddress, order.takerAssetAddress)
+          pair = zocrProviderClient.getPair(order.pojo.makerAssetAddress, order.pojo.takerAssetAddress)
         })
         it('should have ordersCount of 2', async () => {
           const ordersCount = await pair.fetchOrdersCount()
