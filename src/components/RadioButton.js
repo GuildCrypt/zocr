@@ -13,7 +13,7 @@ module.exports = class RadioButton extends Element {
     this.button.$.onchange = this.onChange.bind(this)
 
     const text = new Element('span')
-    text.$.innerText = label
+    text.setText(label)
     text.$.style.marginLeft = 10
     text.$.style.marginRight = 15
 

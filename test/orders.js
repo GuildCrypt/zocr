@@ -9,6 +9,7 @@ const accounts = require('./accounts')
 const amorphHex = require('amorph-hex')
 const Amorph = require('amorph')
 const generateOrders = require('./generateOrders')
+const params = require('../lib/params')
 
 describe('orders', () => {
   let zocrProviderClient
@@ -16,6 +17,7 @@ describe('orders', () => {
   before(async () => {
     zocrProviderClient = await fetchZocrProviderClient()
   })
+
 
   orderParams.forEach((orderParam, index) => {
     describe(`order #${index}: ${orderParam[0]}/${orderParam[1]}`, () => {
@@ -30,6 +32,20 @@ describe('orders', () => {
         const orders = await generateOrders()
         order = orders[index]
       })
+      // after(async () => {
+      //   await order.getMakerAsset().broadcast('approve(address,uint256)', [
+      //     order.pair.zocrProviderClient.exchangeAddress,
+      //     Amorph.from(amorphNumber.unsigned, 0)
+      //   ], {
+      //     from: accounts[0]
+      //   }).getConfirmation()
+      //   await order.getTakerAsset().broadcast('approve(address,uint256)', [
+      //     order.pair.zocrProviderClient.exchangeAddress,
+      //     Amorph.from(amorphNumber.unsigned, 0)
+      //   ], {
+      //     from: accounts[0]
+      //   }).getConfirmation()
+      // })
       it('should create pairId', () => {
         pairId = getPairId(order.pojo.makerAssetAddress, order.pojo.takerAssetAddress)
       })
@@ -66,6 +82,10 @@ describe('orders', () => {
         })
         fetchedOrder = await pair.fetchOrder(_orderIndex)
       })
+      it('order should have valid signature', async () => {
+        const isValidSignature = await order.fetchIsValidSignature()
+        isValidSignature.should.equal(true)
+      })
       it('order and fetchedOrder hashes should match', async () => {
         orderHash = await order.fetchHash()
         fetchedOrderHash = await fetchedOrder.fetchHash()
@@ -77,21 +97,52 @@ describe('orders', () => {
         orderHash.should.amorphEqual(fetchedOrderHash)
       })
       it('order makerAllowance should be 0', () => {
-        return order.fetchMakerAllowance().should.eventually.amorphTo(amorphNumber.unsigned).equal(0)
+        return order.fetchMakerAssetAllowance().should.eventually.amorphTo(amorphNumber.unsigned).equal(0)
       })
-      it('maker should approve 1', () => {
-        console.log('broadcast address', accounts[0].address.to(amorphHex.unprefixed))
-        console.log('broadcast makerAddress', order.getMakerAsset().address.to(amorphHex.unprefixed))
-        console.log('broadcast exchangeAddress', order.pair.zocrProviderClient.exchangeAddress.to(amorphHex.unprefixed))
-        return order.getMakerAsset().broadcast('approve(address,uint256)', [
+      it('should approve makerAsset max', async () => {
+        await order.getMakerAsset().broadcast('approve(address,uint256)', [
           order.pair.zocrProviderClient.exchangeAddress,
-          Amorph.from(amorphNumber.unsigned, 1)
+          params.maxUint256
+        ], {
+          from: accounts[0]
+        }).getConfirmation()
+
+        await order.getMakerAsset().broadcast('approve(address,uint256)', [
+          order.pair.zocrProviderClient.erc20ProxyAddress,
+          params.maxUint256
         ], {
           from: accounts[0]
         }).getConfirmation()
       })
-      it('order makerAllowance should be 0', () => {
-        return order.fetchMakerAllowance().should.eventually.amorphTo(amorphNumber.unsigned).equal(1)
+      it('should approve takerAsset max', async () => {
+        await order.getTakerAsset().broadcast('approve(address,uint256)', [
+          order.pair.zocrProviderClient.exchangeAddress,
+          params.maxUint256
+        ], {
+          from: accounts[0]
+        }).getConfirmation()
+
+        await order.getTakerAsset().broadcast('approve(address,uint256)', [
+          order.pair.zocrProviderClient.erc20ProxyAddress,
+          params.maxUint256
+        ], {
+          from: accounts[0]
+        }).getConfirmation()
+      })
+      it('order makerAllowance should be be max', () => {
+        return order.fetchMakerAssetAllowance().should.eventually.amorphEqual(params.maxUint256)
+      })
+      it('order takerAssetFilled should be 0', () => {
+        return order.fetchTakerAssetFilled().should.eventually.amorphTo(amorphNumber.unsigned).equal(0)
+      })
+      it('should fill order 1', () => {
+        return order.fill(
+          Amorph.from(amorphNumber.unsigned, 101),
+          accounts[0].address
+        )
+      })
+      it('takerAssetFilled should equal 1', () => {
+        return order.fetchTakerAssetFilled().should.eventually.amorphTo(amorphNumber.unsigned).equal(1)
       })
     })
   })

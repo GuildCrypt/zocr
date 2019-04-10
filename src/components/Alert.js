@@ -3,8 +3,8 @@ const Element = require('./Element')
 module.exports = class Alert extends Element {
   constructor(type, text) {
     super('div')
-    this.$.classList.add('alert')
-    this.$.innerText = text || ''
+    this.addClass('alert')
+    this.setText(text)
     this.setType(type)
   }
   setType(type) {
@@ -12,6 +12,6 @@ module.exports = class Alert extends Element {
       this.$.classList.remove(`alert-${this.type}`)
     }
     this.type = type
-    this.$.classList.add(`alert-${type}`)
+    this.addClass(`alert-${type}`)
   }
 }

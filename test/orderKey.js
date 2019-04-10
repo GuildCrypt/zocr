@@ -1,7 +1,6 @@
 const getOrderKey = require('../lib/getOrderKey')
 const Amorph = require('amorph')
 const amorphHex = require('amorph-hex')
-const exchangeStub = require('./exchangeStub')
 
 describe('orderKey', () => {
 

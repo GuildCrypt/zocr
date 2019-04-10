@@ -3,7 +3,7 @@ const Element = require('./Element')
 module.exports = class Table extends Element{
   constructor(headers, rows) {
     super('table')
-    this.$.classList.add('table')
+    this.addClass('table')
     this.rows = []
     if (headers) {
       headers.forEach(this.appendChild.bind(this))

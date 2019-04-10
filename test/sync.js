@@ -24,10 +24,10 @@ describe('sync', () => {
         it('should get pair', () => {
           pair = zocrProviderClient.getPair(order.pojo.makerAssetAddress, order.pojo.takerAssetAddress)
         })
-        it('should have ordersCount of 2', async () => {
-          const ordersCount = await pair.fetchOrdersCount()
-          ordersCount.to(amorphNumber.unsigned).should.equal(2)
-        })
+        // it('should have ordersCount of 2', async () => {
+        //   const ordersCount = await pair.fetchOrdersCount()
+        //   ordersCount.to(amorphNumber.unsigned).should.equal(2)
+        // })
         it('should sync', () => {
           return pair.sync((orderIndex, order) => {
             console.log(`order #${orderIndex.to(amorphNumber.unsigned)}`)

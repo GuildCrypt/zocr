@@ -1,7 +1,7 @@
 const getSplitEncodings = require('../lib/getSplitEncodings')
 const orderParams = require('./orderParams')
 const getPojoFromSplitEncodings = require('../lib/getPojoFromSplitEncodings')
-const amorphBignumber = require('amorph-bignumber')
+const amorphBignumber = require('../lib/amorphBignumber')
 const generateOrders = require('./generateOrders')
 
 const numericKeys = ['makerAssetAmount', 'takerAssetAmount', 'expirationTimeSeconds', 'salt']

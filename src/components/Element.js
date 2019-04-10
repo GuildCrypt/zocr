@@ -8,4 +8,25 @@ module.exports = class Element {
   appendTo$($) {
     $.append(this.$)
   }
+  setText(text) {
+    this.$.innerText = text === undefined ? '' : text
+  }
+  setIsHidden(isHidden) {
+    if (isHidden) {
+      this.setStyle('display', 'none')
+    } else {
+      this.setStyle('display', null)
+    }
+  }
+  setStyle(key, value) {
+    this.$.style[key] = value
+  }
+  addClass(className) {
+    this.$.classList.add(className)
+  }
+  destroy() {
+    if (this.$.parentElement) {
+      this.$.parentElement.removeChild(this.$)
+    }
+  }
 }

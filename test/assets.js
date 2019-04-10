@@ -5,10 +5,13 @@ const assetsStub = require('./assetsStub')
 const Amorph = require('amorph')
 const amorphNumber = require('amorph-number')
 const generateOrders = require('./generateOrders')
+const params = require('../lib/params')
 
-const assetSymbols = ['WETH', 'ZRX', 'USDC', 'DAI']
-const totalSupply = Amorph.from(amorphNumber.unsigned, 100)
+
+const assetSymbols = ['WETH',/* 'ZRX' , 'USDC',*/ 'DAI']
 const assets = {}
+
+const totalSupply = Amorph.from(amorphNumber.unsigned, 200)
 
 describe('assets', () => {
   after(async () => {

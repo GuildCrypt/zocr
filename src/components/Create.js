@@ -2,56 +2,54 @@ const Element = require('./Element')
 const Header = require('./Header')
 const RadioGroup = require('./RadioGroup')
 const RadioButton = require('./RadioButton')
-const Size = require('./Size')
-const Valuation = require('./Valuation')
+const BaseAssetAmountPercentInputGroup = require('./BaseAssetAmountPercentInputGroup')
+const ValuationInputGroup = require('./ValuationInputGroup')
 const Button = require('./Button')
-const Summary = require('./Summary')
+const CreateSummary = require('./CreateSummary')
 const Bignumber = require('bignumber.js')
 const Amorph = require('amorph')
 const SolWrapper = require('ultralightbeam/lib/SolWrapper')
 const Ultralightbeam = require('ultralightbeam')
-const amorphBigumber = require('amorph-bignumber')
+const amorphBignumber = require('../../lib/amorphBignumber')
 const amorphNumber = require('amorph-number')
 const amorphHex = require('amorph-hex')
-const e18 = require('../e18')
-const zeroExExchangeAbi = require('../zeroExExchangeAbi')
+const e18Bignumber = require('../e18Bignumber')
+const Order = require('./../Order')
+const fetchUserAddress = require('../fetchUserAddress')
+const getRandomAmorph = require('ultralightbeam/lib/getRandomAmorph')
+const params = require('../../lib/params')
 
 module.exports = class Create extends Element {
-  constructor(pair) {
+  constructor(main) {
     super('div')
 
-    this.baseLabel = 'Puppy Oath Pieces'
-    this.quoteLabel = 'DAI'
-    this.baseAssetAddress = Amorph.from(amorphHex.unprefixed, '83ebd2b0e093920242cd452d5f781a86ffc8b5a8')
-    this.quoteAssetAddress = Amorph.from(amorphHex.unprefixed, '6e87624b3bc434cd708c2ca517541ddc89c7d5b3')
-    this.buyOrSell = null
-    this.sizeNumber = null
-    this.valuationNumber = null
-    this.pair = pair
+    this.main  = main
 
-    this.ultralightbeam = new Ultralightbeam(web3.currentProvider)
-    this.zeroExExchangeAddress = Amorph.from(amorphHex.unprefixed, 'bce0b5f6eb618c565c3e5f5cd69652bbc279f44e')
+    this.baseAssetAmount = null
+    this.valuation = null
 
-    this.$.classList.add('card')
+    this.addClass('card')
 
     this.body = new Element('div')
-    this.body.$.classList.add('card-body')
+    this.body.addClass('card-body')
 
-    const title = new Header(3, 'Create a new Order')
-    title.$.classList.add('card-title')
+    const title = new Header(3, 'Create Buy Order')
+    title.addClass('card-title')
 
+    this.type = 'buy'
     this.start = new Element('div')
 
-    const buyOrSell = new RadioGroup([
-      new RadioButton('Buy', 'buy'),
-      new RadioButton('Sell', 'sell')
-    ])
+    // const type = new RadioGroup([
+    //   new RadioButton('Buy', 'buy'),
+    //   new RadioButton('Sell', 'sell')
+    // ])
 
-    this.size = new Size()
-    this.valuation = new Valuation('DAI')
+    this.baseAssetAmountPercentInputGroup = new BaseAssetAmountPercentInputGroup(100)
+    this.valuationInputGroup = new ValuationInputGroup('DAI')
 
-    this.size.$.style.display = 'none'
-    this.valuation.$.style.display = 'none'
+    // this.baseAssetAmountPercentInputGroup.setIsHidden(true)
+    // this.valuationInputGroup.setIsHidden(true)
+    this.valuationInputGroup.$.style.marginBottom = 10
 
     const buttonGroup = new Element('div')
     buttonGroup.$.style.textAlign = 'right'
@@ -62,13 +60,13 @@ module.exports = class Create extends Element {
     buttonGroup.appendChild(this.nextButton)
 
 
-    buyOrSell.emitter.on('change', this.onBuyOrSellChange.bind(this))
-    this.size.emitter.on('change', this.onSizeChange.bind(this))
-    this.valuation.emitter.on('change', this.onValuationChange.bind(this))
+    // type.emitter.on('change', this.onTypeChange.bind(this))
+    this.baseAssetAmountPercentInputGroup.emitter.on('change.baseAssetAmount', this.onBaseAssetAmountChange.bind(this))
+    this.valuationInputGroup.emitter.on('change.valuation', this.onValuationChange.bind(this))
 
-    this.start.appendChild(buyOrSell)
-    this.start.appendChild(this.size)
-    this.start.appendChild(this.valuation)
+    // this.start.appendChild(type)
+    this.start.appendChild(this.baseAssetAmountPercentInputGroup)
+    this.start.appendChild(this.valuationInputGroup)
     this.start.appendChild(buttonGroup)
 
     this.body.appendChild(title)
@@ -77,54 +75,84 @@ module.exports = class Create extends Element {
     this.appendChild(this.body)
   }
 
-  onBuyOrSellChange(buyOrSell) {
-    this.buyOrSell = buyOrSell
-    this.size.$.style.display = null
-    this.valuation.$.style.display = null
-    this.setAmounts()
+  // onTypeChange(type) {
+  //   this.type = type
+  //   this.baseAssetAmountPercentInputGroup.setIsHidden(false)
+  //   this.valuationInputGroup.setIsHidden(false)
+  //   this.setOrder()
+  //   this.updateNextButton()
+  // }
+
+  onBaseAssetAmountChange(baseAssetAmount) {
+    this.baseAssetAmount = baseAssetAmount
+    this.setOrder()
     this.updateNextButton()
   }
 
-  onSizeChange(sizeNumber) {
-    this.sizeNumber = sizeNumber
-    this.setAmounts()
-    this.updateNextButton()
-  }
-
-  onValuationChange(valuationNumber) {
-    this.valuationNumber = valuationNumber
-    this.setAmounts()
+  onValuationChange(valuation) {
+    this.valuation = valuation
+    this.setOrder()
     this.updateNextButton()
   }
 
   getIsReadyForSummary() {
-    if (this.buyOrSell === null) {
-      this.nextButton.setIsDisabled(true)
+    if (this.type === null) {
       return false
     }
-    if (this.sizeNumber === null) {
-      this.nextButton.setIsDisabled(true)
+    if (this.baseAssetAmount === null) {
       return false
     }
-    if (this.valuationNumber === null) {
-      this.nextButton.setIsDisabled(true)
+    if (this.valuation === null) {
       return false
     }
     return true
   }
 
-  setAmounts() {
+  getQuoteAssetAmount() {
+    return this.valuation.as(amorphBignumber.unsigned, (valuationBignumber) => {
+      return valuationBignumber.times(this.baseAssetAmount.to(amorphBignumber.unsigned)).div(10000)
+    })
+  }
+
+  getMakerAssetAddress() {
+    return this.type === 'buy' ? this.main.quoteAssetAddress : this.main.baseAssetAddress
+  }
+
+  getMakerAssetLabel() {
+    return this.type === 'buy' ? this.main.quoteAssetAddress : this.main.baseAssetAddress
+  }
+
+  getTakerAssetAddress() {
+    return this.type === 'buy' ? this.main.baseAssetAddress : this.main.quoteAssetAddress
+  }
+
+  getMakerAssetAmount() {
+    return this.type === 'buy' ? this.getQuoteAssetAmount() : this.baseAssetAmount
+  }
+
+  getTakerAssetAmount() {
+    return this.type === 'buy' ? this.baseAssetAmount : this.this.getQuoteAssetAmount()
+  }
+
+  async setOrder() {
     if (!this.getIsReadyForSummary()) {
+      this.order = null
       return
     }
-    this.baseAssetAmount = Amorph.from(amorphNumber.unsigned, 100 * this.sizeNumber)
-    this.quoteAssetAmount = e18.as(amorphBigumber.unsigned, (e18Bignumber) => {
-      return e18Bignumber.div(100).mul(this.sizeNumber).mul(this.valuationNumber)
+
+    const makerAddress = await fetchUserAddress()
+
+    this.order = new Order(this.main.pair, {
+      makerAddress,
+      makerAssetAddress: this.getMakerAssetAddress(),
+      takerAssetAddress: this.getTakerAssetAddress(),
+      makerAssetAmount: this.getMakerAssetAmount(),
+      takerAssetAmount: this.getTakerAssetAmount(),
+      expirationTimeSeconds: params.maxExpirationTimeSeconds,
+      salt: getRandomAmorph(4)
     })
-    this.makerAssetAddress = this.buyOrSell === 'buy' ? this.quoteAssetAddress : this.baseAssetAddress
-    this.takerAssetAddress = this.buyOrSell === 'buy' ? this.baseAssetAddress : this.quoteAssetAddress
-    this.makerAssetAmount = this.buyOrSell === 'buy' ? this.quoteAssetAmount : this.baseAssetAmount
-    this.takerAssetAmount = this.buyOrSell === 'buy' ? this.baseAssetAmount : this.quoteAssetAmount
+    this.order.setBaseAssetLabel(this.main.baseAssetLabel)
+    this.order.setQuoteAssetLabel(this.main.quoteAssetLabel)
   }
 
   updateNextButton() {
@@ -132,8 +160,13 @@ module.exports = class Create extends Element {
   }
 
   onNextButtonClick() {
-    this.start.$.style.display = 'none'
-    this.summary = new Summary(this)
+    this.start.setIsHidden(true)
+    this.summary = new CreateSummary(this)
     this.body.appendChild(this.summary)
+  }
+
+  backToStart() {
+    this.summary.setIsHidden(true)
+    this.start.setIsHidden(false)
   }
 }

@@ -2,7 +2,7 @@ const zocrStub = require('./zocrStub')
 const localStorageDbStub = require('./localStorageDbStub')
 const ultralightbeam = require('./ultralightbeam')
 const ZocrProviderClient = require('../lib/ZocrProviderClient')
-const exchangeStub = require('./exchangeStub')
+const zeroExContractAddresses = require('./zeroExContractAddresses')
 
 let zocrProviderClient
 
@@ -13,8 +13,13 @@ module.exports = async function fetchZocrProviderClient() {
 
   const localStorageDb = await localStorageDbStub.promise
   const zocr = await zocrStub.promise
-  const exchange = await exchangeStub.promise
 
-  zocrProviderClient = new ZocrProviderClient(ultralightbeam.provider, localStorageDb, zocr.address, exchange.address)
+  zocrProviderClient = new ZocrProviderClient(
+    ultralightbeam.provider,
+    localStorageDb,
+    zocr.address,
+    zeroExContractAddresses.exchange,
+    zeroExContractAddresses.erc20Proxy
+  )
   return zocrProviderClient
 }

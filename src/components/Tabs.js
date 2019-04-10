@@ -3,8 +3,8 @@ const Element = require('./Element')
 module.exports = class Tabs extends Element{
   constructor(tabs) {
     super('ul')
-    this.$.classList.add('nav')
-    this.$.classList.add('nav-tabs')
+    this.addClass('nav')
+    this.addClass('nav-tabs')
     this.$.style.marginBottom = 10
     this.tabs = []
     if (tabs) {
