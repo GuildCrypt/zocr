@@ -1,6 +1,6 @@
 const zocrStub = require('./zocrStub')
 const localStorageDbStub = require('./localStorageDbStub')
-const ultralightbeam = require('./ultralightbeam')
+const fetchUltralightbeam =  require('./fetchUltralightbeam')
 const ZocrProviderClient = require('../lib/ZocrProviderClient')
 const zeroExContractAddresses = require('./zeroExContractAddresses')
 

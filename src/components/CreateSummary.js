@@ -12,12 +12,12 @@ const e18Bignumber = require('../e18Bignumber')
 const Order = require('../../lib/Order')
 const Amorph = require('amorph')
 const getRandomAmorph = require('ultralightbeam/lib/getRandomAmorph')
-const metamaskSubprovider = require('../metamaskSubprovider')
+const fetchSubprovider = require('../fetchSubprovider')
 const Alert = require('./Alert')
-const web3Zocr = require('../web3Zocr')
+const fetchWeb3Zocr = require('../fetchWeb3Zocr')
 const Table = require('./Table')
 const ButtonGroup = require('./ButtonGroup')
-const ultralightbeam = require('../ultralightbeam')
+const fetchUltralightbeam =  require('../fetchUltralightbeam')
 
 module.exports = class CreateSummary extends Element {
   constructor(create) {
@@ -109,13 +109,15 @@ module.exports = class CreateSummary extends Element {
 
   async onSignButtonClick() {
     try {
+      const subprovider = await fetchSubprovider()
       this.signButton.setIsHidden(true)
       this.setStatus('info', 'Awaiting signature. Please follow the instructions on your Ethereum wallet.')
-      await this.create.order.setSignature(metamaskSubprovider, this.create.order.pojo.makerAddress)
-      this.setStatus('info', 'Order has been signed, now you need to submit. Please follow the instructions on your Ethereum wallet.')
+      await this.create.order.setSignature(subprovider, this.create.order.pojo.makerAddress)
+      this.setStatus('info', 'Order has been signed, now you need to submit. Please follow the instructions on your Ethereum wallet. If you have Metamask, you may need to click the Metamask icon.')
       const transactionHashHexPrefixed = await this.web3ZocrAdd(this.create.order)
       this.setStatus('info', 'Order has been broadcast. Waiting for confirmation...')
       const transactionHash = Amorph.from(amorphHex.prefixed, transactionHashHexPrefixed)
+      const ultralightbeam = await fetchUltralightbeam()
       await ultralightbeam.waitForConfirmation(transactionHash)
       this.setStatus('success', 'Order has been broadcast!')
     } catch(error) {
@@ -125,7 +127,8 @@ module.exports = class CreateSummary extends Element {
     }
   }
 
-  web3ZocrAdd(order) {
+  async web3ZocrAdd(order) {
+    const web3Zocr = await fetchWeb3Zocr()
     return new Promise((resolve, reject) => {
       web3Zocr.add(
         this.create.main.pair.id.to(amorphHex.prefixed),

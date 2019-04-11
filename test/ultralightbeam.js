@@ -19,6 +19,6 @@ const provider = ganache.provider({
   }),
   // db_path: `${__dirname}/0x_ganache_snapshot`
 })
-const ultralightbeam = new Ultralightbeam(provider)
+const fetchUltralightbeam =  new Ultralightbeam(provider)
 
 module.exports = ultralightbeam

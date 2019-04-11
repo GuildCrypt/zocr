@@ -12,13 +12,11 @@ const e18Bignumber = require('../e18Bignumber')
 const Order = require('../../lib/Order')
 const Amorph = require('amorph')
 const getRandomAmorph = require('ultralightbeam/lib/getRandomAmorph')
-const metamaskSubprovider = require('../metamaskSubprovider')
 const Alert = require('./Alert')
-const web3Zocr = require('../web3Zocr')
 const Table = require('./Table')
 const fetchUserAddress = require('../fetchUserAddress')
 const ButtonGroup = require('./ButtonGroup')
-const ultralightbeam = require('../ultralightbeam')
+const fetchUltralightbeam =  require('../fetchUltralightbeam')
 
 module.exports = class FillSummary extends Element {
   constructor(fillModal) {
@@ -128,6 +126,7 @@ module.exports = class FillSummary extends Element {
       console.log(userAddress.to(amorphHex.prefixed))
       const transactionHash = await this.fillModal.order.fill(this.fillModal.getTakerAssetAmount(), userAddress)
       this.setStatus('info', 'Fill order has been broadcasted. Waiting for confirmation...')
+      const ultralightbeam = await fetchUltralightbeam()
       await ultralightbeam.waitForConfirmation(transactionHash)
       this.fillButton.setIsHidden(true)
       this.buttonGroup.setIsHidden(false)

@@ -3,32 +3,56 @@ const Alert = require('./Alert')
 const Create = require('./Create')
 const amorphNumber = require('amorph-number')
 const amorphHex = require('amorph-hex')
-const OrdersTable = require('./OrdersTable')
+const OrdersPage = require('./OrdersPage')
 const Tabs = require('./Tabs')
 const Tab = require('./Tab')
 const fetchUserAddress = require('../fetchUserAddress')
 const Order = require('../Order')
-const ultralightbeam = require('../ultralightbeam')
+const fetchUltralightbeam =  require('../fetchUltralightbeam')
 const amorphBignumber = require('../../lib/amorphBignumber')
 const e18Bignumber = require('../e18Bignumber')
+const fetchZocrProviderClient = require('../fetchZocrProviderClient')
 
 module.exports = class Main extends Element {
-  constructor(pair, baseAssetLabel, quoteAssetLabel, baseAssetAddress, quoteAssetAddress) {
+  constructor(baseAssetLabel, quoteAssetLabel, baseAssetAddress, quoteAssetAddress) {
     super('div')
 
-    this.pair = pair
     this.baseAssetLabel = baseAssetLabel
     this.quoteAssetLabel = quoteAssetLabel
     this.baseAssetAddress = baseAssetAddress
     this.quoteAssetAddress = quoteAssetAddress
+    this.status = new Alert('info', 'Loading...')
 
-    this.pair.setBaseAssetAddress(baseAssetAddress)
+    this.appendChild(this.status)
+
+    this.bootstrap()
+
+  }
+
+  async bootstrap() {
+
+    if (!window.web3) {
+      this.setStatus('danger', 'No Ethereum wallet detected. Please install Metamask.')
+      return
+    }
+
+    const userAddress = await fetchUserAddress()
+
+    if (userAddress === null) {
+      this.setStatus('danger', 'Ethereum wallet detected, but no default address is set. Make sure you have logged in.')
+      return
+    }
+
+    const zocrProviderClient = await fetchZocrProviderClient()
+
+    this.pair = zocrProviderClient.getPair(this.baseAssetAddress, this.quoteAssetAddress)
+    this.pair.setBaseAssetAddress(this.baseAssetAddress)
+    this.pair.setQuoteAssetAddress(this.quoteAssetAddress)
 
     this.balances = new Element('div')
-    this.status = new Alert('info', 'Loading...')
     this.create = new Create(this)
-    this.buyOrdersTable = new OrdersTable(this, false)
-    this.userOrdersTable = new OrdersTable(this, true)
+    this.buyOrdersPage = new OrdersPage(this, false)
+    this.userOrdersPage = new OrdersPage(this, true)
 
     this.baseAssetBalance = new Element('span')
     this.quoteAssetBalance = new Element('span')
@@ -40,9 +64,9 @@ module.exports = class Main extends Element {
 
     // const sellDisabledAlert = new Alert('danger', 'Sell orders not currently displayed')
 
-    const buyTab = new Tab('Buy Orders', this.buyOrdersTable)
+    const buyTab = new Tab('Buy Orders', this.buyOrdersPage)
     // const sellTab = new Tab('Sell Orders', sellDisabledAlert)
-    const myTab = new Tab('My Orders', this.userOrdersTable)
+    const myTab = new Tab('My Orders', this.userOrdersPage)
     const createTab = new Tab('Create Buy Order', this.create)
 
     const tabs = new Tabs([
@@ -54,16 +78,17 @@ module.exports = class Main extends Element {
 
     buyTab.setIsSelected(true)
 
-    this.appendChild(this.status)
+
     this.appendChild(this.balances)
     this.appendChild(tabs)
-    this.appendChild(this.buyOrdersTable)
+    this.appendChild(this.buyOrdersPage)
     // this.appendChild(sellDisabledAlert)
-    this.appendChild(this.userOrdersTable)
+    this.appendChild(this.userOrdersPage)
     this.appendChild(this.create)
     this.syncOrders()
     this.setBalances()
 
+    const ultralightbeam = await fetchUltralightbeam()
     ultralightbeam.blockPoller.emitter.on('block', this.syncOrders.bind(this))
     ultralightbeam.blockPoller.emitter.on('block', this.setBalances.bind(this))
   }
@@ -87,7 +112,9 @@ module.exports = class Main extends Element {
     }
     this.isSyncingOrders = true
     this.setStatus('info', 'Checking for new orders...')
+    console.log('fetch ordersCount')
     const ordersCount = await this.pair.fetchOrdersCount()
+    console.log(ordersCount.to(amorphNumber.unsigned))
     const ordersCountNumber = ordersCount.to(amorphNumber.unsigned)
     const syncedToNumber = this.pair.syncedTo.to(amorphNumber.unsigned)
 
@@ -106,11 +133,11 @@ module.exports = class Main extends Element {
         if (type === 'buy') {
           const isValidSignature = await order.fetchIsValidSignature()
           if (isValidSignature) {
-            this.buyOrdersTable.addOrder(orderIndex, order)
+            this.buyOrdersPage.addOrder(orderIndex, order)
           }
         }
         if (order.pojo.makerAddress.equals(userAddress)) {
-          this.userOrdersTable.addOrder(orderIndex, order)
+          this.userOrdersPage.addOrder(orderIndex, order)
         }
         const orderIndexNumber = orderIndex.to(amorphNumber.unsigned)
         if (orderIndexNumber > 0) {

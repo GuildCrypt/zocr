@@ -1,5 +1,4 @@
 const Table = require('./Table')
-const OrderRow = require('./OrderRow')
 const Th = require('./Th')
 
 module.exports = class OrdersTable extends Table {
@@ -21,17 +20,11 @@ module.exports = class OrdersTable extends Table {
 
     this.main = main
     this.showFilledOrders = showFilledOrders
+    this.setIsHidden(true)
 
     idHeader.setStyle('color', '#999')
     typeHeader.setStyle('color', '#999')
     originalHeader.setStyle('color', '#999')
 
-  }
-  addOrder(orderIndex, order) {
-    const orderRow = new OrderRow(this.main, orderIndex, order, this.showFilledOrders)
-    this.addRow(orderRow)
-    this.sort((rowA, rowB) => {
-      return rowB.order.getPriceBignumber().minus(rowA.order.getPriceBignumber()).toNumber()
-    })
   }
 }

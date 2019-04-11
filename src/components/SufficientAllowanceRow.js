@@ -1,7 +1,7 @@
 const Cell = require('./Cell')
 const Alert = require('./Alert')
 const SolWrapper = require('ultralightbeam/lib/SolWrapper')
-const ultralightbeam = require('../ultralightbeam')
+const fetchUltralightbeam =  require('../fetchUltralightbeam')
 const erc20Abi = require('../erc20Abi')
 const Amorph = require('amorph')
 const amorphHex = require('amorph-hex')
@@ -106,6 +106,7 @@ module.exports = class SufficientAllowanceRow extends Row {
     try {
       const transactionHashHexPrefixed = await this.web3AssetApproveZeroExExchangeAddress()
       this.setStatus('info', 'Waiting for confirmation...')
+      const ultralightbeam = await fetchUltralightbeam()
       await ultralightbeam.waitForConfirmation(
         Amorph.from(amorphHex.prefixed, transactionHashHexPrefixed)
       )

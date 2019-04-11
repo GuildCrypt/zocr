@@ -4,7 +4,8 @@ const amorphBignumber = require('../../lib/amorphBignumber')
 const e18Bignumber = require('../e18Bignumber')
 const Anchor = require('./Anchor')
 const FillModal = require('./FillModal')
-const ultralightbeam = require('../ultralightbeam')
+const CancelModal = require('./CancelModal')
+const fetchUltralightbeam =  require('../fetchUltralightbeam')
 const amorphNumber = require('amorph-number')
 const fetchUserAddress = require('../fetchUserAddress')
 
@@ -51,7 +52,9 @@ module.exports = class OrderRow extends Row {
 
     this.onBlock()
 
-    ultralightbeam.blockPoller.emitter.on('block', this.onBlock.bind(this))
+    fetchUltralightbeam().then((ultralightbeam) => {
+      ultralightbeam.blockPoller.emitter.on('block', this.onBlock.bind(this))
+    })
 
     this.setCancelAnchor()
   }
@@ -100,8 +103,17 @@ module.exports = class OrderRow extends Row {
     this.getFillModal().open()
   }
 
-  openCancelModal() {
+  getCancelModal() {
+    if (this.cancelModal) {
+      return this.cancelModal
+    }
+    this.cancelModal = new CancelModal(this.main, this.order)
+    document.body.appendChild(this.cancelModal.$)
+    return this.cancelModal
+  }
 
+  openCancelModal() {
+    this.getCancelModal().open()
   }
 
 }

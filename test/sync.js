@@ -1,5 +1,5 @@
 const ZocrProviderClient = require('../lib/ZocrProviderClient')
-const ultralightbeam = require('./ultralightbeam')
+const fetchUltralightbeam =  require('./fetchUltralightbeam')
 const Pair = require('../lib/Pair')
 const amorphNumber = require('amorph-number')
 const localStorageDbStub = require('./localStorageDb')

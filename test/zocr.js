@@ -1,4 +1,4 @@
-const ultralightbeam = require('./ultralightbeam')
+const fetchUltralightbeam =  require('./fetchUltralightbeam')
 const zocrInfo = require('../')
 const getSplitEncodings = require('../lib/getSplitEncodings')
 const accounts = require('./accounts')

@@ -1,4 +1,4 @@
-const ultralightbeam = require('./ultralightbeam')
+const fetchUltralightbeam =  require('./fetchUltralightbeam')
 const accounts = require('./accounts')
 const assetInfo = require('./assetInfo')
 const assetsStub = require('./assetsStub')
