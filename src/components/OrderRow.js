@@ -10,15 +10,20 @@ const amorphNumber = require('amorph-number')
 const fetchUserAddress = require('../fetchUserAddress')
 
 module.exports = class OrderRow extends Row {
-  constructor(main, orderIndex, order, showFilledOrders) {
+  constructor(main, orderIndex, order, isMyOrders) {
     super([])
 
     this.main = main
     this.orderIndex = orderIndex
     this.order = order
-    this.showFilledOrders = showFilledOrders
+    this.isMyOrders = isMyOrders
 
-    this.idCell = new Cell(orderIndex.to(amorphNumber.unsigned))
+    const idStringUnpadded = orderIndex.to(amorphNumber.unsigned).toString()
+    const paddingCount = idStringUnpadded.length < 4 ? 4 - idStringUnpadded.length : 0
+    const padding = '0'.repeat(paddingCount)
+
+
+    this.idCell = new Cell(`${padding}${idStringUnpadded}`)
     this.typeCell = new Cell(order.getPrettyType())
     this.baseAssetAmountPercentCell = new Cell(
       `${order.getBaseAssetAmountPercentBignumber()}%`
@@ -50,23 +55,35 @@ module.exports = class OrderRow extends Row {
     this.appendChild(this.fillCell)
     this.appendChild(this.cancelCell)
 
-    this.onBlock()
+    this.updateBaseAssetFillablePercentCell()
+    this.updateCancelCell()
+
+    if (!isMyOrders) {
+      this.typeCell.setIsHidden(true)
+      this.baseAssetAmountPercentCell.setIsHidden(true)
+    }
 
     fetchUltralightbeam().then((ultralightbeam) => {
-      ultralightbeam.blockPoller.emitter.on('block', this.onBlock.bind(this))
+      ultralightbeam.blockPoller.emitter.on('block', this.updateBaseAssetFillablePercentCell.bind(this))
+      ultralightbeam.blockPoller.emitter.on('block', this.updateCancelCell.bind(this))
     })
 
-    this.setCancelAnchor()
   }
 
-  async setCancelAnchor() {
+  async updateCancelCell() {
+    const isCancelled = await this.order.fetchIsCancelled()
+    if (isCancelled) {
+      this.cancelAnchor.setIsHidden(true)
+      this.cancelCell.setText('Cancelled')
+      return
+    }
     const userAddress = await fetchUserAddress()
     if (userAddress.equals(this.order.pojo.makerAddress)) {
       this.cancelAnchor.setIsHidden(false)
     }
   }
 
-  async onBlock() {
+  async updateBaseAssetFillablePercentCell() {
     const baseAssetFillablePercentBignumber = await this.order.fetchBaseAssetFillablePercentBignumber()
 
     if (
@@ -81,7 +98,7 @@ module.exports = class OrderRow extends Row {
 
     if (baseAssetFillablePercentBignumber.eq(0)) {
       this.fillAnchor.setIsHidden(true)
-      if (!this.showFilledOrders) {
+      if (!this.isMyOrders) {
         this.setIsHidden(true)
       }
     } else {

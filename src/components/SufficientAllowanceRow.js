@@ -91,7 +91,7 @@ module.exports = class SufficientAllowanceRow extends Row {
     const allowanceBn = await this.fetchAllowanceBn()
     if (allowanceBn.lt(this.assetAmount.to(amorphBignumber.unsigned))) {
       this.isValid = false
-      this.setStatus('danger', `You need to approve 0x to exchange your ${this.assetLabel}`)
+      this.setStatus('danger', `You need to approve 0x to exchange your ${this.assetLabel}. 0x is a decentralized exchange protocol. Giving access to 0x allows you to place and fill orders.`)
       this.approveErc20ProxyAddressButton.setIsHidden(false)
     } else {
       this.isValid = true
@@ -100,7 +100,7 @@ module.exports = class SufficientAllowanceRow extends Row {
     this.emitter.emit('change', this.isValid)
   }
   async approveErc20ProxyAddress() {
-    this.setStatus('info', 'Approving 0x Exchange. Please follow the instructions on your Ethereum wallet.')
+    this.setStatus('info', 'Approving 0x. Please follow the instructions on your Ethereum wallet.')
     this.approveErc20ProxyAddressButton.setIsHidden(true)
 
     try {

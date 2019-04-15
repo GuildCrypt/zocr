@@ -21,6 +21,11 @@ module.exports = class Element {
   setStyle(key, value) {
     this.$.style[key] = value
   }
+  setStyles(styles) {
+    Object.keys(styles).forEach((key) => {
+      this.setStyle(key, styles[key])
+    })
+  }
   addClass(className) {
     this.$.classList.add(className)
   }

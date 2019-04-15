@@ -1,9 +1,17 @@
 const Amorph = require('amorph')
 const amorphHex = require('amorph-hex')
-const Main = require('./components/Main')
+const Zocrscope = require('./components/Zocrscope')
 
-const daiAddress = Amorph.from(amorphHex.unprefixed, 'e84a3d3c9ee3a8e44be4148982c3b1594b59f5a7')
-const puppyAddress = Amorph.from(amorphHex.unprefixed, '83ebd2b0e093920242cd452d5f781a86ffc8b5a8')
+const params = document.location.hash.substr(1).split('/')
 
-const main = new Main('Puppy Oath Pieces', 'DAI', puppyAddress, daiAddress)
+const baseAssetLabel = decodeURI(params[0])
+const quoteAssetLabel = decodeURI(params[1])
+const baseAssetAddressHexUnprefixed = params[2]
+const quoteAssetAddressHexUnprefixed = params[3]
+
+
+const daiAddress = Amorph.from(amorphHex.unprefixed, baseAssetAddressHexUnprefixed)
+const puppyAddress = Amorph.from(amorphHex.unprefixed, quoteAssetAddressHexUnprefixed)
+
+const main = new Zocrscope(baseAssetLabel, quoteAssetLabel, puppyAddress, daiAddress)
 main.appendTo$(document.body)

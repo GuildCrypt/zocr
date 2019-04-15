@@ -41,6 +41,7 @@
     "amorph": "^4.2.0",
     "amorph-base64": "^4.0.0",
     "amorph-bignumber": "^4.0.0",
+    "amorph-boolean": "^1.0.0",
     "bignumber": "^1.1.0",
     "bignumber.js": "^8.1.1",
     "bitcore-lib": "^0.16.0",

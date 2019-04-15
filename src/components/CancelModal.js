@@ -51,7 +51,7 @@ module.exports = class CancelModal extends Modal {
       this.setStatus('info', 'Order cancellation broadcasted. Waiting for confirmation...')
       const ultralightbeam = await fetchUltralightbeam()
       await ultralightbeam.waitForConfirmation(transactionHash)
-      this.setStatus('info', 'Order cancellation confirmed!')
+      this.setStatus('success', 'Order cancellation confirmed!')
     } catch (error) {
       this.setStatus('danger', error)
       this.buttonGroup.setIsHidden(false)
