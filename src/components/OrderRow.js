@@ -8,6 +8,7 @@ const CancelModal = require('./CancelModal')
 const fetchUltralightbeam =  require('../fetchUltralightbeam')
 const amorphNumber = require('amorph-number')
 const fetchUserAddress = require('../fetchUserAddress')
+const amorphHex = require('amorph-hex')
 
 module.exports = class OrderRow extends Row {
   constructor(main, orderIndex, order, isMyOrders) {
@@ -66,6 +67,7 @@ module.exports = class OrderRow extends Row {
     fetchUltralightbeam().then((ultralightbeam) => {
       ultralightbeam.blockPoller.emitter.on('block', this.updateBaseAssetFillablePercentCell.bind(this))
       ultralightbeam.blockPoller.emitter.on('block', this.updateCancelCell.bind(this))
+      ultralightbeam.blockPoller.emitter.on('block', this.updateFillCell.bind(this))
     })
 
   }
@@ -83,6 +85,20 @@ module.exports = class OrderRow extends Row {
     }
   }
 
+  async updateFillCell() {
+    const userAddress = await fetchUserAddress()
+    if (userAddress.equals(this.order.pojo.makerAddress)) {
+      return
+    }
+
+    const baseAssetFillablePercentBignumber = await this.order.fetchBaseAssetFillablePercentBignumber()
+    if (baseAssetFillablePercentBignumber.eq(0)) {
+      this.fillAnchor.setIsHidden(true)
+    } else {
+      this.fillAnchor.setIsHidden(false)
+    }
+  }
+
   async updateBaseAssetFillablePercentCell() {
     const baseAssetFillablePercentBignumber = await this.order.fetchBaseAssetFillablePercentBignumber()
 
@@ -97,40 +113,24 @@ module.exports = class OrderRow extends Row {
     this.baseAssetFillablePercentCell.setText(`${baseAssetFillablePercentBignumber}%`)
 
     if (baseAssetFillablePercentBignumber.eq(0)) {
-      this.fillAnchor.setIsHidden(true)
       if (!this.isMyOrders) {
         this.setIsHidden(true)
       }
     } else {
-      this.fillAnchor.setIsHidden(false)
       this.setIsHidden(false)
     }
   }
 
-  getFillModal() {
-    if (this.fillModal) {
-      return this.fillModal
-    }
-    this.fillModal = new FillModal(this.main, this.order)
-    document.body.appendChild(this.fillModal.$)
-    return this.fillModal
-  }
-
   openFillModal() {
-    this.getFillModal().open()
-  }
-
-  getCancelModal() {
-    if (this.cancelModal) {
-      return this.cancelModal
-    }
-    this.cancelModal = new CancelModal(this.main, this.order)
-    document.body.appendChild(this.cancelModal.$)
-    return this.cancelModal
+    const fillModal = new FillModal(this.main, this.order)
+    document.body.appendChild(fillModal.$)
+    fillModal.open()
   }
 
   openCancelModal() {
-    this.getCancelModal().open()
+    const cancelModal = new CancelModal(this.main, this.order)
+    document.body.appendChild(cancelModal.$)
+    cancelModal.open()
   }
 
 }

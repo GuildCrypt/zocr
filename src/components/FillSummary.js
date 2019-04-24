@@ -29,17 +29,12 @@ module.exports = class FillSummary extends Element {
 
     this.accountCell = new Cell()
 
-    const accountRow = new Row([
-      new Cell('Account'),
-      this.accountCell
-    ])
-
     this.setAccount()
 
     const baseRow = new Row([
       new Cell(fillModal.order.getPrettyAntitype()),
       new Cell(
-        `${fillModal.baseAssetAmount.to(amorphBignumber.unsigned).div(10000).times(100)}% of ${fillModal.main.baseAssetLabel} (${fillModal.baseAssetAmount.to(amorphNumber.unsigned)}/10000)`
+        `${fillModal.baseAssetAmount.to(amorphBignumber.unsigned).div(10000).times(100)}% of all ${fillModal.main.baseAssetLabel} (${fillModal.baseAssetAmount.to(amorphNumber.unsigned)}/10000)`
       )
     ])
 
@@ -68,7 +63,6 @@ module.exports = class FillSummary extends Element {
     this.sufficientBalanceRow.emitter.on('change', this.setFillButtonIsDisabled.bind(this))
 
     const table = new Table([
-      accountRow,
       baseRow,
       quoteRow,
       valuationRow,
@@ -123,7 +117,6 @@ module.exports = class FillSummary extends Element {
     this.buttonGroup.setIsHidden(true)
     try {
       const userAddress = await fetchUserAddress()
-      console.log(userAddress.to(amorphHex.prefixed))
       const transactionHash = await this.fillModal.order.fill(this.fillModal.getTakerAssetAmount(), userAddress)
       this.setStatus('info', 'Fill order has been broadcasted. Waiting for confirmation...')
       const ultralightbeam = await fetchUltralightbeam()

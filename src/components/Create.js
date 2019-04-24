@@ -85,13 +85,11 @@ module.exports = class Create extends Element {
 
   onBaseAssetAmountChange(baseAssetAmount) {
     this.baseAssetAmount = baseAssetAmount
-    this.setOrder()
     this.updateNextButton()
   }
 
   onValuationChange(valuation) {
     this.valuation = valuation
-    this.setOrder()
     this.updateNextButton()
   }
 
@@ -134,15 +132,14 @@ module.exports = class Create extends Element {
     return this.type === 'buy' ? this.baseAssetAmount : this.this.getQuoteAssetAmount()
   }
 
-  async setOrder() {
-    if (!this.getIsReadyForSummary()) {
-      this.order = null
-      return
-    }
+  updateNextButton() {
+    this.nextButton.setIsDisabled(!this.getIsReadyForSummary())
+  }
 
+  async onNextButtonClick() {
     const makerAddress = await fetchUserAddress()
 
-    this.order = new Order(this.main.pair, {
+    const order = new Order(this.main.pair, {
       makerAddress,
       makerAssetAddress: this.getMakerAssetAddress(),
       takerAssetAddress: this.getTakerAssetAddress(),
@@ -151,17 +148,11 @@ module.exports = class Create extends Element {
       expirationTimeSeconds: params.maxExpirationTimeSeconds,
       salt: getRandomAmorph(4)
     })
-    this.order.setBaseAssetLabel(this.main.baseAssetLabel)
-    this.order.setQuoteAssetLabel(this.main.quoteAssetLabel)
-  }
+    order.setBaseAssetLabel(this.main.baseAssetLabel)
+    order.setQuoteAssetLabel(this.main.quoteAssetLabel)
 
-  updateNextButton() {
-    this.nextButton.setIsDisabled(!this.getIsReadyForSummary())
-  }
-
-  onNextButtonClick() {
     this.start.setIsHidden(true)
-    this.summary = new CreateSummary(this)
+    this.summary = new CreateSummary(this, order)
     this.body.appendChild(this.summary)
   }
 

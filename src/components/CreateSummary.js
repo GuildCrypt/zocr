@@ -20,23 +20,20 @@ const ButtonGroup = require('./ButtonGroup')
 const fetchUltralightbeam =  require('../fetchUltralightbeam')
 
 module.exports = class CreateSummary extends Element {
-  constructor(create) {
+  constructor(create, order) {
     super('div')
 
     this.create = create
+    this.order = order
 
-    const makerAssetLabel = create.order.getMakerAssetLabel()
+    const makerAssetLabel = order.getMakerAssetLabel()
 
     const title = new Header(4, 'Order Summary')
 
-    const accountRow = new Row([
-      new Cell('Account'),
-      new Cell(create.order.pojo.makerAddress.to(amorphHex.prefixed))
-    ])
     const baseRow = new Row([
-      new Cell(create.order.getPrettyType()),
+      new Cell(order.getPrettyType()),
       new Cell(
-        `${create.baseAssetAmount.to(amorphBignumber.unsigned).div(10000).times(100)}% of ${create.main.baseAssetLabel} (${create.baseAssetAmount.to(amorphNumber.unsigned)}/10000)`
+        `${create.baseAssetAmount.to(amorphBignumber.unsigned).div(10000).times(100)}% of all ${create.main.baseAssetLabel} (${create.baseAssetAmount.to(amorphNumber.unsigned)}/10000)`
       )
     ])
     const quoteRow = new Row([
@@ -58,21 +55,20 @@ module.exports = class CreateSummary extends Element {
     this.signButton.setIsDisabled(true)
 
     this.sufficientAllowanceRow = new SufficientAllowanceRow(
-      create.order.pojo.makerAssetAddress,
+      order.pojo.makerAssetAddress,
       makerAssetLabel,
-      create.order.pojo.makerAssetAmount
+      order.pojo.makerAssetAmount
     )
     this.sufficientBalanceRow = new SufficientBalanceRow(
-      create.order.pojo.makerAssetAddress,
+      order.pojo.makerAssetAddress,
       makerAssetLabel,
-      create.order.pojo.makerAssetAmount
+      order.pojo.makerAssetAmount
     )
 
     this.sufficientAllowanceRow.emitter.on('change', this.setSignButtonIsDisabled.bind(this))
     this.sufficientBalanceRow.emitter.on('change', this.setSignButtonIsDisabled.bind(this))
 
     const table = new Table([
-      accountRow,
       baseRow,
       quoteRow,
       valuationRow,
@@ -112,9 +108,9 @@ module.exports = class CreateSummary extends Element {
       const subprovider = await fetchSubprovider()
       this.signButton.setIsHidden(true)
       this.setStatus('info', 'Awaiting signature. Please follow the instructions on your Ethereum wallet.')
-      await this.create.order.setSignature(subprovider, this.create.order.pojo.makerAddress)
+      await this.order.setSignature(subprovider, this.order.pojo.makerAddress)
       this.setStatus('info', 'Order has been signed, now you need to submit. Please follow the instructions on your Ethereum wallet. If you have Metamask, you may need to click the Metamask icon.')
-      const transactionHashHexPrefixed = await this.web3ZocrAdd(this.create.order)
+      const transactionHashHexPrefixed = await this.web3ZocrAdd(this.order)
       this.setStatus('info', 'Order has been broadcast. Waiting for confirmation...')
       const transactionHash = Amorph.from(amorphHex.prefixed, transactionHashHexPrefixed)
       const ultralightbeam = await fetchUltralightbeam()

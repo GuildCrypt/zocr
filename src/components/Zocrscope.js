@@ -25,14 +25,14 @@ module.exports = class Zocrscope extends Element {
 
     this.appendChild(this.status)
 
-    this.bootstrap()
-
+    setTimeout(this.bootstrap.bind(this), 1000)
   }
 
   async bootstrap() {
 
     if (!window.web3) {
       this.setStatus('danger', 'No Ethereum wallet detected. Please install Metamask.')
+      setTimeout(this.bootstrap.bind(this), 100)
       return
     }
 
@@ -40,6 +40,7 @@ module.exports = class Zocrscope extends Element {
 
     if (userAddress === null) {
       this.setStatus('danger', 'Ethereum wallet detected, but no default address is set. Make sure you have logged in.')
+      setTimeout(this.bootstrap.bind(this), 100)
       return
     }
 
@@ -54,12 +55,15 @@ module.exports = class Zocrscope extends Element {
     this.buyOrdersPage = new OrdersPage(this, false)
     this.userOrdersPage = new OrdersPage(this, true)
 
+    this.balancesLabel = new Element('span')
     this.baseAssetBalance = new Element('span')
     this.quoteAssetBalance = new Element('span')
+    this.balances.appendChild(this.balancesLabel)
     this.balances.appendChild(this.baseAssetBalance)
     this.balances.appendChild(this.quoteAssetBalance)
 
-    this.quoteAssetBalance.setStyle('marginLeft', 30)
+    this.balancesLabel.setStyle('fontWeight', 'bold')
+    this.baseAssetBalance.setStyle('margin', '0 10')
     this.balances.setStyle('marginBottom', 10)
 
     // const sellDisabledAlert = new Alert('danger', 'Sell orders not currently displayed')
@@ -101,7 +105,8 @@ module.exports = class Zocrscope extends Element {
     const userAddress = await fetchUserAddress()
     const baseAssetBalance = await this.pair.getBaseAsset().fetch('balanceOf(address)', [userAddress])
     const quoteAssetBalance = await this.pair.getQuoteAsset().fetch('balanceOf(address)', [userAddress])
-    this.baseAssetBalance.setText(`${baseAssetBalance.to(amorphBignumber.unsigned).div(10000).times(100)}% of ${this.baseAssetLabel} (${baseAssetBalance.to(amorphBignumber.unsigned)}/10000)`)
+    this.balancesLabel.setText('Balances: ')
+    this.baseAssetBalance.setText(`${baseAssetBalance.to(amorphBignumber.unsigned).div(10000).times(100)}% of all ${this.baseAssetLabel} (${baseAssetBalance.to(amorphBignumber.unsigned)}/10000)`)
     this.quoteAssetBalance.setText(`${quoteAssetBalance.to(amorphBignumber.unsigned).div(e18Bignumber)} ${this.quoteAssetLabel}`)
     this.isSettingBalances = false
   }
@@ -112,9 +117,7 @@ module.exports = class Zocrscope extends Element {
     }
     this.isSyncingOrders = true
     this.setStatus('info', 'Checking for new orders...')
-    console.log('fetch ordersCount')
     const ordersCount = await this.pair.fetchOrdersCount()
-    console.log(ordersCount.to(amorphNumber.unsigned))
     const ordersCountNumber = ordersCount.to(amorphNumber.unsigned)
     const syncedToNumber = this.pair.syncedTo.to(amorphNumber.unsigned)
 

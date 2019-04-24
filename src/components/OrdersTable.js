@@ -4,7 +4,6 @@ const Tooltip = require('./Tooltip')
 
 module.exports = class OrdersTable extends Table {
   constructor(main, isMyOrders) {
-    console.log('main', main)
     const idHeader = new Th('ID #')
     const typeHeader = new Th('Type')
     const originalHeader = new Th('Original Size')

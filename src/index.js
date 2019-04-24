@@ -9,9 +9,10 @@ const quoteAssetLabel = decodeURI(params[1])
 const baseAssetAddressHexUnprefixed = params[2]
 const quoteAssetAddressHexUnprefixed = params[3]
 
+document.title = `Trade ${baseAssetLabel}`
 
-const daiAddress = Amorph.from(amorphHex.unprefixed, baseAssetAddressHexUnprefixed)
-const puppyAddress = Amorph.from(amorphHex.unprefixed, quoteAssetAddressHexUnprefixed)
+const baseAssetAddress = Amorph.from(amorphHex.unprefixed, baseAssetAddressHexUnprefixed)
+const quoteAssetAddress = Amorph.from(amorphHex.unprefixed, quoteAssetAddressHexUnprefixed)
 
-const main = new Zocrscope(baseAssetLabel, quoteAssetLabel, puppyAddress, daiAddress)
+const main = new Zocrscope(baseAssetLabel, quoteAssetLabel, baseAssetAddress, quoteAssetAddress)
 main.appendTo$(document.body)

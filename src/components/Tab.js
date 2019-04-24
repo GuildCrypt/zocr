@@ -10,7 +10,7 @@ module.exports = class Tab extends Element{
     this.isSelected = false
     this.link = new Element('a')
     this.link.addClass('nav-link')
-    this.link.$.href = '#'
+    this.link.$.href = document.location.hash
     this.link.setText(text)
     this.appendChild(this.link)
     this.$.onclick = this.onClick.bind(this)
