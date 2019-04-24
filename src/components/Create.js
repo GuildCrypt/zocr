@@ -33,16 +33,15 @@ module.exports = class Create extends Element {
     this.body = new Element('div')
     this.body.addClass('card-body')
 
-    const title = new Header(3, 'Create Buy Order')
+    const title = new Header(3, 'Create Order')
     title.addClass('card-title')
 
-    this.type = 'buy'
     this.start = new Element('div')
 
-    // const type = new RadioGroup([
-    //   new RadioButton('Buy', 'buy'),
-    //   new RadioButton('Sell', 'sell')
-    // ])
+    this.type = new RadioGroup([
+      new RadioButton('Buy', 'buy', true),
+      new RadioButton('Sell', 'sell', false)
+    ])
 
     this.baseAssetAmountPercentInputGroup = new BaseAssetAmountPercentInputGroup(100)
     this.valuationInputGroup = new ValuationInputGroup('DAI')
@@ -60,11 +59,11 @@ module.exports = class Create extends Element {
     buttonGroup.appendChild(this.nextButton)
 
 
-    // type.emitter.on('change', this.onTypeChange.bind(this))
+    this.type.emitter.on('change', this.onTypeChange.bind(this))
     this.baseAssetAmountPercentInputGroup.emitter.on('change.baseAssetAmount', this.onBaseAssetAmountChange.bind(this))
     this.valuationInputGroup.emitter.on('change.valuation', this.onValuationChange.bind(this))
 
-    // this.start.appendChild(type)
+    this.start.appendChild(this.type)
     this.start.appendChild(this.baseAssetAmountPercentInputGroup)
     this.start.appendChild(this.valuationInputGroup)
     this.start.appendChild(buttonGroup)
@@ -75,13 +74,11 @@ module.exports = class Create extends Element {
     this.appendChild(this.body)
   }
 
-  // onTypeChange(type) {
-  //   this.type = type
-  //   this.baseAssetAmountPercentInputGroup.setIsHidden(false)
-  //   this.valuationInputGroup.setIsHidden(false)
-  //   this.setOrder()
-  //   this.updateNextButton()
-  // }
+  onTypeChange(type) {
+    this.type = type
+    this.updateNextButton()
+  }
+
 
   onBaseAssetAmountChange(baseAssetAmount) {
     this.baseAssetAmount = baseAssetAmount
@@ -129,7 +126,7 @@ module.exports = class Create extends Element {
   }
 
   getTakerAssetAmount() {
-    return this.type === 'buy' ? this.baseAssetAmount : this.this.getQuoteAssetAmount()
+    return this.type === 'buy' ? this.baseAssetAmount : this.getQuoteAssetAmount()
   }
 
   updateNextButton() {

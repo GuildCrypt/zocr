@@ -53,6 +53,7 @@ module.exports = class Zocrscope extends Element {
     this.balances = new Element('div')
     this.create = new Create(this)
     this.buyOrdersPage = new OrdersPage(this, false)
+    this.sellOrdersPage = new OrdersPage(this, false)
     this.userOrdersPage = new OrdersPage(this, true)
 
     this.balancesLabel = new Element('span')
@@ -68,14 +69,20 @@ module.exports = class Zocrscope extends Element {
 
     // const sellDisabledAlert = new Alert('danger', 'Sell orders not currently displayed')
 
-    const buyTab = new Tab('Buy Orders', this.buyOrdersPage)
-    // const sellTab = new Tab('Sell Orders', sellDisabledAlert)
-    const myTab = new Tab('My Orders', this.userOrdersPage)
-    const createTab = new Tab('Create Buy Order', this.create)
+    const buyTab = new Tab('Buy Orders', this.buyOrdersPage, (rowA, rowB) => {
+      return rowB.order.getPriceBignumber().minus(rowA.order.getPriceBignumber()).toNumber()
+    })
+    const sellTab = new Tab('Sell Orders', this.sellOrdersPage, (rowA, rowB) => {
+      return rowA.order.getPriceBignumber().minus(rowB.order.getPriceBignumber()).toNumber()
+    })
+    const myTab = new Tab('My Orders', this.userOrdersPage, () => {
+      return 1
+    })
+    const createTab = new Tab('Create Order', this.create)
 
     const tabs = new Tabs([
       buyTab,
-      // sellTab,
+      sellTab,
       myTab,
       createTab
     ])
@@ -86,7 +93,7 @@ module.exports = class Zocrscope extends Element {
     this.appendChild(this.balances)
     this.appendChild(tabs)
     this.appendChild(this.buyOrdersPage)
-    // this.appendChild(sellDisabledAlert)
+    this.appendChild(this.sellOrdersPage)
     this.appendChild(this.userOrdersPage)
     this.appendChild(this.create)
     this.syncOrders()
@@ -133,10 +140,14 @@ module.exports = class Zocrscope extends Element {
         order.setQuoteAssetLabel(this.quoteAssetLabel)
 
         const type = order.getType()
+        const isValidSignature = await order.fetchIsValidSignature()
         if (type === 'buy') {
-          const isValidSignature = await order.fetchIsValidSignature()
           if (isValidSignature) {
             this.buyOrdersPage.addOrder(orderIndex, order)
+          }
+        } else {
+          if (isValidSignature) {
+            this.sellOrdersPage.addOrder(orderIndex, order)
           }
         }
         if (order.pojo.makerAddress.equals(userAddress)) {

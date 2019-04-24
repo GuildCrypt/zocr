@@ -28,7 +28,7 @@ module.exports = class CreateSummary extends Element {
 
     const makerAssetLabel = order.getMakerAssetLabel()
 
-    const title = new Header(4, 'Order Summary')
+    const title = new Header(4, 'Summary')
 
     const baseRow = new Row([
       new Cell(order.getPrettyType()),

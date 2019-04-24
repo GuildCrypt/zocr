@@ -2,7 +2,7 @@ const Element = require('./Element')
 const Emitter = require('events')
 
 module.exports = class RadioButton extends Element {
-  constructor(label, value) {
+  constructor(label, value, isSelected) {
     super('label')
 
     this.value = value
@@ -19,6 +19,10 @@ module.exports = class RadioButton extends Element {
 
     this.appendChild(this.button)
     this.appendChild(text)
+
+    if (isSelected) {
+      this.setIsSelected(true)
+    }
   }
   onChange(event) {
     this.emitter.emit('change', this.value)
