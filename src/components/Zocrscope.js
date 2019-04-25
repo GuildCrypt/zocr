@@ -52,9 +52,15 @@ module.exports = class Zocrscope extends Element {
 
     this.balances = new Element('div')
     this.create = new Create(this)
-    this.buyOrdersPage = new OrdersPage(this, false)
-    this.sellOrdersPage = new OrdersPage(this, false)
-    this.userOrdersPage = new OrdersPage(this, true)
+    this.buyOrdersPage = new OrdersPage(this, false, (rowA, rowB) => {
+      return rowB.order.getPriceBignumber().minus(rowA.order.getPriceBignumber()).toNumber()
+    })
+    this.sellOrdersPage = new OrdersPage(this, false, (rowA, rowB) => {
+      return rowA.order.getPriceBignumber().minus(rowB.order.getPriceBignumber()).toNumber()
+    })
+    this.userOrdersPage = new OrdersPage(this, true, () => {
+      return 1
+    })
 
     this.balancesLabel = new Element('span')
     this.baseAssetBalance = new Element('span')
@@ -69,15 +75,9 @@ module.exports = class Zocrscope extends Element {
 
     // const sellDisabledAlert = new Alert('danger', 'Sell orders not currently displayed')
 
-    const buyTab = new Tab('Buy Orders', this.buyOrdersPage, (rowA, rowB) => {
-      return rowB.order.getPriceBignumber().minus(rowA.order.getPriceBignumber()).toNumber()
-    })
-    const sellTab = new Tab('Sell Orders', this.sellOrdersPage, (rowA, rowB) => {
-      return rowA.order.getPriceBignumber().minus(rowB.order.getPriceBignumber()).toNumber()
-    })
-    const myTab = new Tab('My Orders', this.userOrdersPage, () => {
-      return 1
-    })
+    const buyTab = new Tab('Buy Orders', this.buyOrdersPage)
+    const sellTab = new Tab('Sell Orders', this.sellOrdersPage)
+    const myTab = new Tab('My Orders', this.userOrdersPage)
     const createTab = new Tab('Create Order', this.create)
 
     const tabs = new Tabs([

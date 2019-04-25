@@ -11,7 +11,7 @@ module.exports = class OrdersPage extends Element {
     this.isMyOrders = isMyOrders
     this.status = new Alert('info', 'Nothing here')
     this.sort = sort
-    this.ordersTable = new OrdersTable(main, isMyOrders, sort)
+    this.ordersTable = new OrdersTable(main, isMyOrders)
     this.ordersTable.setIsHidden(true)
     this.appendChild(this.status)
     this.appendChild(this.ordersTable)
@@ -19,6 +19,8 @@ module.exports = class OrdersPage extends Element {
   addOrder(orderIndex, order) {
     const orderRow = new OrderRow(this.main, orderIndex, order, this.isMyOrders)
     this.ordersTable.addRow(orderRow)
+    console.log('sort', this.sort)
+    this.ordersTable.sort(this.sort)
     this.status.setIsHidden(true)
     this.ordersTable.setIsHidden(false)
   }
