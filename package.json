@@ -1,6 +1,6 @@
 {
   "name": "zocr",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "description": "An On-Chain Relay for 0x v2",
   "main": "index.js",
   "directories": {
