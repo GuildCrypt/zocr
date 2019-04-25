@@ -19,7 +19,6 @@ module.exports = class OrdersPage extends Element {
   addOrder(orderIndex, order) {
     const orderRow = new OrderRow(this.main, orderIndex, order, this.isMyOrders)
     this.ordersTable.addRow(orderRow)
-    console.log('sort', this.sort)
     this.ordersTable.sort(this.sort)
     this.status.setIsHidden(true)
     this.ordersTable.setIsHidden(false)
