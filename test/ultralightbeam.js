@@ -17,8 +17,8 @@ const provider = ganache.provider({
       balance: getRandomAmorph(16).to(amorphNumber.unsigned)
     }
   }),
-  // db_path: `${__dirname}/0x_ganache_snapshot`
+  db_path: `${__dirname}/0x_ganache_snapshot`
 })
-const fetchUltralightbeam =  new Ultralightbeam(provider)
+const ultralightbeam =  new Ultralightbeam(provider)
 
 module.exports = ultralightbeam
